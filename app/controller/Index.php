@@ -4,12 +4,37 @@ namespace app\controller;
 
 use app\BaseController;
 use app\model\User;
+use think\facade\Db;
 
 class Index extends BaseController
 {
     public function index()
     {
+        // 6.0.8
         dump(app()->version());
+
+        Db::name('user')->where([
+            'user_id' => 1
+        ])->update([
+            'user_status' => 2
+        ]);
+
+        // 能正常更新 
+        // 但是没触发 onBeforeUpdate
+        // UPDATE `user`  SET `user_status` = 1  WHERE  `user_id` = 1
+        User::withoutGlobalScope(['status'])->save([
+            'user_status' => 1,
+            'user_id' => 1
+        ]);
+
+        // 能正常更新 
+        // 但是没触发 onBeforeUpdate
+        // UPDATE `user`  SET `user_status` = 1  WHERE  `user_id` = 1
+        $a = User::withoutGlobalScope(['status'])->find(1);
+        $a->withoutGlobalScope(['status'])->save([
+            'user_status' => 1,
+            'user_id' => $a->user_id
+        ]);
         try {
             // 数据已经查询出来了
             // SELECT * FROM `user` WHERE  `user_id` = 1 LIMIT 1
@@ -21,7 +46,8 @@ class Index extends BaseController
         }
         try {
             // 生成的sql 无法更新数据
-            // UPDATE `user`  SET `user_status` = 1  WHERE  `user_status` = 1  AND `user_id` = 1 
+            // 能触发 onBeforeUpdate
+            // UPDATE `user`  SET `user_status` = 1  WHERE  `user_status` = 1  AND `user_id` = 1
             $a = User::withoutGlobalScope(['status'])->find(1);
             $a->user_status = 1;
             $a->save();
@@ -30,6 +56,7 @@ class Index extends BaseController
         }
         try {
             // 生成的sql 无法更新数据
+            // 能触发 onBeforeUpdate
             // UPDATE `user`  SET `user_status` = 1  WHERE  `user_status` = 1  AND `user_id` = 1
             User::update([
                 'user_status' => 1
@@ -41,6 +68,7 @@ class Index extends BaseController
         }
         try {
             // 生成的sql 无法更新数据
+            // 能触发 onBeforeUpdate
             // UPDATE `user`  SET `user_status` = 1  WHERE  `user_status` = 1
             $a->update([
                 'user_status' => 1
@@ -50,7 +78,8 @@ class Index extends BaseController
         }
         try {
             // 生成的sql 无法更新数据了
-            // UPDATE `user`  SET `user_status` = 1  WHERE  `user_status` = 1  AND `user_id` = 1 
+            // 能触发 onBeforeUpdate
+            // UPDATE `user`  SET `user_status` = 1  WHERE  `user_status` = 1  AND `user_id` = 1  
             $a->save([
                 'user_status' => 1
             ]);
