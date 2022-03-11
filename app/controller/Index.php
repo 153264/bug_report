@@ -16,12 +16,13 @@ class Index extends BaseController
         Db::name('user')->where([
             'user_id' => 1
         ])->update([
-            'user_status' => 2
+            'user_status' => 2,
+            'update_time' => null
         ]);
 
         // 能正常更新 
         // 但是没触发 onBeforeUpdate
-        // UPDATE `user`  SET `user_status` = 1  WHERE  `user_id` = 1
+        // UPDATE `user`  SET `user_status` = 1  WHERE  `user_id` = 1 
         User::withoutGlobalScope(['status'])->save([
             'user_status' => 1,
             'user_id' => 1
@@ -29,7 +30,7 @@ class Index extends BaseController
 
         // 能正常更新 
         // 但是没触发 onBeforeUpdate
-        // UPDATE `user`  SET `user_status` = 1  WHERE  `user_id` = 1
+        // UPDATE `user`  SET `user_status` = 1  WHERE  `user_id` = 1 
         $a = User::withoutGlobalScope(['status'])->find(1);
         $a->withoutGlobalScope(['status'])->save([
             'user_status' => 1,
@@ -47,7 +48,7 @@ class Index extends BaseController
         try {
             // 生成的sql 无法更新数据
             // 能触发 onBeforeUpdate
-            // UPDATE `user`  SET `user_status` = 1  WHERE  `user_status` = 1  AND `user_id` = 1
+            // UPDATE `user`  SET `user_status` = 1 , `update_time` = '2022-03-12 06:32:59'  WHERE  `user_status` = 1  AND `user_id` = 1 
             $a = User::withoutGlobalScope(['status'])->find(1);
             $a->user_status = 1;
             $a->save();
@@ -57,7 +58,7 @@ class Index extends BaseController
         try {
             // 生成的sql 无法更新数据
             // 能触发 onBeforeUpdate
-            // UPDATE `user`  SET `user_status` = 1  WHERE  `user_status` = 1  AND `user_id` = 1
+            // UPDATE `user`  SET `user_status` = 1 , `update_time` = '2022-03-12 06:34:06'  WHERE  `user_status` = 1  AND `user_id` = 1
             User::update([
                 'user_status' => 1
             ], [
@@ -69,7 +70,7 @@ class Index extends BaseController
         try {
             // 生成的sql 无法更新数据
             // 能触发 onBeforeUpdate
-            // UPDATE `user`  SET `user_status` = 1  WHERE  `user_status` = 1
+            // UPDATE `user`  SET `user_status` = 1 , `update_time` = '2022-03-12 06:34:38'  WHERE  `user_status` = 1
             $a->update([
                 'user_status' => 1
             ]);
@@ -79,7 +80,7 @@ class Index extends BaseController
         try {
             // 生成的sql 无法更新数据了
             // 能触发 onBeforeUpdate
-            // UPDATE `user`  SET `user_status` = 1  WHERE  `user_status` = 1  AND `user_id` = 1  
+            // UPDATE `user`  SET `user_status` = 1 , `update_time` = '2022-03-12 06:35:01'  WHERE  `user_status` = 1  AND `user_id` = 1  
             $a->save([
                 'user_status' => 1
             ]);

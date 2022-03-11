@@ -16,6 +16,7 @@ class User extends BaseModel
         'user_id'          => 'int',
         'user_name'        => 'string',
         'user_status'      => 'int',
+        'update_time'      => 'datetime',
     ];
     // 全局的查询范围
     protected $globalScope = ['status'];
@@ -27,7 +28,6 @@ class User extends BaseModel
 
     public static function onBeforeUpdate($model)
     {
-        dump('执行 onBeforeUpdate');
-        // throw new Exception("执行 onBeforeUpdate", 1);
+        $model->update_time = date('Y-m-d H:i:s');
     }
 }
